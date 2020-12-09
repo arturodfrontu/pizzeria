@@ -53,9 +53,11 @@
   };
 
   class Product{
-    constructor(){
+    constructor(id, data){
       const thisProduct = this;
       console.log('new product:', thisProduct );
+      thisProduct.id = id;
+      thisProduct.data = data;
     }
   }
 
