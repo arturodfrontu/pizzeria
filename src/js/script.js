@@ -1,8 +1,6 @@
 /* global Handlebars, utils, dataSource */ // eslint-disable-line no-unused-vars
-
 {
   'use strict';
-
   const select = {
     templateOf: {
       menuProduct: '#template-menu-product',
@@ -32,14 +30,12 @@
       },
     },
   };
-
   const classNames = {
     menuProduct: {
       wrapperActive: 'active',
       imageVisible: 'active',
     },
   };
-
   const settings = {
     amountWidget: {
       defaultValue: 1,
@@ -47,17 +43,16 @@
       defaultMax: 9,
     }
   };
-
   const templates = {
     menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
   };
-
   class Product{
     constructor(id, data){
       const thisProduct = this;
       thisProduct.id = id;
       thisProduct.data = data;
       thisProduct.renderInMenu();
+      thisProduct.selectElements();
       thisProduct.initAccordion();
     }
     renderInMenu(){
@@ -67,12 +62,17 @@
       const menuContainer = document.querySelector(select.containerOf.menu);
       menuContainer.appendChild(thisProduct.element);
     }
+    selectElements(){
+      const thisProduct = this;
+      thisProduct.accordionTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
+      thisProduct.form = thisProduct.element.querySelector(select.menuProduct.form);
+      thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
+      thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
+      thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+    }
     initAccordion(){
       const thisProduct = this;
-
-      const clickableTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
-
-      clickableTrigger.addEventListener('click', function(event) {
+      thisProduct.accordionTrigger.addEventListener('click', function(event){
         event.preventDefault();
         const allActiveProducts = document.querySelectorAll(select.all.menuProductsActive);
         for(let activeProduct of allActiveProducts){
@@ -84,20 +84,15 @@
       });
     }
   }
-
-
   const app = {
     initMenu: function(){
       const thisApp = this;
-
       for(let productData in thisApp.data.products){
         new Product(productData, thisApp.data.products[productData]);
       }
     },
-
     initData: function(){
       const thisApp = this;
-
       thisApp.data = dataSource;
     },
     init: function(){
@@ -106,6 +101,5 @@
       thisApp.initMenu();
     },
   };
-
   app.init();
 }
