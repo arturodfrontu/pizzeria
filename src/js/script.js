@@ -87,18 +87,15 @@
     }
     initOrderForm(){
       const thisProduct = this;
-      console.log('++++', this.initOrderForm);
       thisProduct.form.addEventListener('submit', function(event){
         event.preventDefault();
         thisProduct.processOrder();
       });
-
       for(let input of thisProduct.formInputs){
         input.addEventListener('change', function(){
           thisProduct.processOrder();
         });
       }
-
       thisProduct.cartButton.addEventListener('click', function(event){
         event.preventDefault();
         thisProduct.processOrder();
@@ -106,7 +103,24 @@
     }
     processOrder(){
       const thisProduct = this;
-      console.log('++++', this.processOrder);
+      const formData = utils.serializeFormToObject(thisProduct.form);
+      let price = thisProduct.data.price;
+      for(let paramId in thisProduct.data.params) {
+        const param = thisProduct.data.params[paramId];
+        for(let optionId in param.options) {
+          const option = param.options[optionId];
+          if(formData[paramId] && formData[paramId].includes(optionId)){
+            if(option.default == true){
+              //console.log('is default');
+            } else {
+              price = price + option.price;
+            }
+          } else {
+            price = price - option.price;
+          }
+        }
+      }
+      thisProduct.priceElem.innerHTML = price;
     }
   }
   const app = {
