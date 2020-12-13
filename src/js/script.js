@@ -110,17 +110,15 @@
         for(let optionId in param.options) {
           const option = param.options[optionId];
           if(formData[paramId] && formData[paramId].includes(optionId)){
-            if(option.default == true){
-              //console.log('is default');
-            } else {
-              price = price + option.price;
-            }
-          } else {
+            if(option.default) {
+              price = price + 0;
+            } else if(!option.default) { price = price + option.price;}
+          } else if (option.default){
             price = price - option.price;
           }
+          thisProduct.priceElem.innerHTML = price;
         }
       }
-      thisProduct.priceElem.innerHTML = price;
     }
   }
   const app = {
@@ -129,6 +127,8 @@
       for(let productData in thisApp.data.products){
         new Product(productData, thisApp.data.products[productData]);
       }
+      console.log('+|||+', classNames);
+      console.log('+++|||+++', settings);
     },
     initData: function(){
       const thisApp = this;
