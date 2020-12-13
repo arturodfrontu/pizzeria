@@ -131,7 +131,6 @@
             }
           }
           thisProduct.priceElem.innerHTML = price;
-
         }
       }
     }
