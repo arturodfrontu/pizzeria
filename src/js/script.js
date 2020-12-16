@@ -54,6 +54,8 @@
       thisProduct.renderInMenu();
       thisProduct.selectElements();
       thisProduct.initAccordion();
+      thisProduct.initOrderForm();
+      thisProduct.processOrder();
     }
     renderInMenu(){
       const thisProduct = this;
@@ -83,6 +85,41 @@
         thisProduct.element.classList.toggle('active');
       });
     }
+    initOrderForm(){
+      const thisProduct = this;
+      thisProduct.form.addEventListener('submit', function(event){
+        event.preventDefault();
+        thisProduct.processOrder();
+      });
+      for(let input of thisProduct.formInputs){
+        input.addEventListener('change', function(){
+          thisProduct.processOrder();
+        });
+      }
+      thisProduct.cartButton.addEventListener('click', function(event){
+        event.preventDefault();
+        thisProduct.processOrder();
+      });
+    }
+    processOrder(){
+      const thisProduct = this;
+      const formData = utils.serializeFormToObject(thisProduct.form);
+      let price = thisProduct.data.price;
+      for(let paramId in thisProduct.data.params) {
+        const param = thisProduct.data.params[paramId];
+        for(let optionId in param.options) {
+          const option = param.options[optionId];
+          if(formData[paramId] && formData[paramId].includes(optionId)){
+            if(option.default) {
+              price = price + 0;
+            } else if(!option.default) { price = price + option.price;}
+          } else if (option.default){
+            price = price - option.price;
+          }
+          thisProduct.priceElem.innerHTML = price;
+        }
+      }
+    }
   }
   const app = {
     initMenu: function(){
@@ -90,6 +127,8 @@
       for(let productData in thisApp.data.products){
         new Product(productData, thisApp.data.products[productData]);
       }
+      console.log('+|||+', classNames);
+      console.log('+++|||+++', settings);
     },
     initData: function(){
       const thisApp = this;
