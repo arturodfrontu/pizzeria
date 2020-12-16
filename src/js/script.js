@@ -55,6 +55,7 @@
       thisProduct.selectElements();
       thisProduct.initAccordion();
       thisProduct.initOrderForm();
+      thisProduct.initAmountWidget();
       thisProduct.processOrder();
     }
     renderInMenu(){
@@ -71,6 +72,8 @@
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
       thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
+      thisProduct.amountWidgetElem = thisProduct.element.querySelector(select.menuProduct.amountWidget);
     }
     initAccordion(){
       const thisProduct = this;
@@ -109,18 +112,44 @@
         const param = thisProduct.data.params[paramId];
         for(let optionId in param.options) {
           const option = param.options[optionId];
-          if(formData[paramId] && formData[paramId].includes(optionId)){
+          const selectedOption = formData[paramId] && formData[paramId].includes(optionId);
+          if(selectedOption){
             if(option.default) {
               price = price + 0;
-            } else if(!option.default) { price = price + option.price;}
+            } else if(!option.default) {
+              price = price + option.price;
+            }
           } else if (option.default){
             price = price - option.price;
           }
+          const optionImage = thisProduct.imageWrapper.querySelector('.' + paramId + '-' + optionId);
+          if(optionImage !== null){
+            if(selectedOption){
+              optionImage.classList.add(classNames.menuProduct.imageVisible);
+            } else {
+              optionImage.classList.remove(classNames.menuProduct.imageVisible);
+            }
+          }
           thisProduct.priceElem.innerHTML = price;
+
         }
       }
     }
+    initAmountWidget(){
+      const thisProduct = this;
+      thisProduct.amountWidget = new AmountWidget(thisProduct.amountWidgetElem);
+    }
   }
+
+  class AmountWidget{
+    constructor(element){
+      const thisWidget = this;
+      console.log('+++++++++++', thisWidget);
+      console.log('ca: ++++', element);
+
+    }
+  }
+
   const app = {
     initMenu: function(){
       const thisApp = this;
