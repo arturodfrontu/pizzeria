@@ -108,7 +108,7 @@
           }
 
         }
-            thisProduct.element.classList.toggle('active');
+        thisProduct.element.classList.toggle('active');
       });
     }
 
@@ -194,9 +194,8 @@
       const thisWidget = this;
 
       thisWidget.getElements(element);
-      thisWidget.setValue(thisWidget.input.value);
-      console.log('+++++++++++', thisWidget);
-      console.log('ca: ++++', element);
+      thisWidget.setValue(settings.amountWidget.defaultValue);
+      thisWidget.initActions();
 
     }
 
@@ -213,12 +212,41 @@
       const thisWidget = this;
       const newValue =parseInt(value);
 
-      if(thisWidget.value !== newValue && !isNaN(newValue)) {
+      if(thisWidget.value !== newValue && !isNaN(newValue) && newValue <= settings.amountWidget.defaultMax && newValue >= settings.amountWidget.defaultMin) {
         thisWidget.value = newValue;
+        thisWidget.announce()
       }
 
-      thisWidget.value = newValue;
       thisWidget.input.value = thisWidget.value;
+    }
+
+    announce() {
+      const thisWidget = this;
+
+      const event = new CustomEvent('updated', {
+        bubbles: true
+      });
+      thisWidget.element.dispatchEvent(event);
+    }
+
+    initActions() {
+      const thisWidget = this;
+
+      thisWidget.input.addEventListener('change', function (event) {
+        event.preventDefault();
+        thisWidget.setValue(thisWidget.input.value);
+      });
+
+      thisWidget.linkDecrease.addEventListener('click', function (event) {
+        event.preventDefault();
+        thisWidget.setValue(parseInt(thisWidget.input.value) - 1);
+      });
+
+      thisWidget.linkIncrease.addEventListener('click', function (event) {
+        event.preventDefault();
+        thisWidget.setValue(parseInt(thisWidget.input.value) + 1);
+      });
+
     }
   }
 
@@ -228,8 +256,7 @@
       for(let productData in thisApp.data.products){
         new Product(productData, thisApp.data.products[productData]);
       }
-      console.log('+|||+', classNames);
-      console.log('+++|||+++', settings);
+
     },
     initData: function(){
       const thisApp = this;
