@@ -72,11 +72,9 @@
     renderInMenu(){
       const thisProduct = this;
       const generatedHTML = templates.menuProduct(thisProduct.data);
-
-      thisProduct.element = utils.createDOMFromHTML(generatedHTML);
-
       const menuContainer = document.querySelector(select.containerOf.menu);
 
+      thisProduct.element = utils.createDOMFromHTML(generatedHTML);
       menuContainer.appendChild(thisProduct.element);
     }
 
@@ -106,9 +104,8 @@
           if(activeProduct !== thisProduct.element && activeProduct !== null){
             activeProduct.classList.remove('active');
           }
-
         }
-            thisProduct.element.classList.toggle('active');
+        thisProduct.element.classList.toggle('active');
       });
     }
 
@@ -176,7 +173,6 @@
           }
 
           thisProduct.priceElem.innerHTML = price;
-
         }
       }
     }
@@ -195,9 +191,6 @@
 
       thisWidget.getElements(element);
       thisWidget.setValue(thisWidget.input.value);
-      console.log('+++++++++++', thisWidget);
-      console.log('ca: ++++', element);
-
     }
 
     getElements(element){
@@ -228,8 +221,6 @@
       for(let productData in thisApp.data.products){
         new Product(productData, thisApp.data.products[productData]);
       }
-      console.log('+|||+', classNames);
-      console.log('+++|||+++', settings);
     },
     initData: function(){
       const thisApp = this;
