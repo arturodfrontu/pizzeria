@@ -6,15 +6,18 @@
       menuProduct: '#template-menu-product',
       cartProduct: '#template-cart-product',
     },
+
     containerOf: {
       menu: '#product-list',
       cart: '#cart',
     },
+
     all: {
       menuProducts: '#product-list > .product',
       menuProductsActive: '#product-list > .product.active',
       formInputs: 'input, select',
     },
+
     menuProduct: {
       clickable: '.product__header',
       form: '.product__order',
@@ -23,6 +26,7 @@
       amountWidget: '.widget-amount',
       cartButton: '[href="#add-to-cart"]',
     },
+
     widgets: {
       amount: {
         input: 'input.amount',
@@ -56,6 +60,7 @@
       wrapperActive: 'active',
       imageVisible: 'active',
     },
+
     cart: {
       wrapperActive: 'active',
     },
@@ -65,8 +70,9 @@
     amountWidget: {
       defaultValue: 1,
       defaultMin: 1,
-      defaultMax: 10,
+      defaultMax: 9,
     },
+
     cart: {
       defaultDeliveryFee: 20,
     },
@@ -75,6 +81,7 @@
   const templates = {
     menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
     cartProduct: Handlebars.compile(document.querySelector(select.templateOf.cartProduct).innerHTML),
+
   };
 
   class Product{
@@ -147,6 +154,7 @@
       thisProduct.cartButton.addEventListener('click', function(event){
         event.preventDefault();
         thisProduct.processOrder();
+        thisProduct.addToCart();
       });
     }
 
@@ -187,8 +195,9 @@
               optionImage.classList.remove(classNames.menuProduct.imageVisible);
             }
           }
-
-          thisProduct.priceElem.innerHTML = price;
+          thisProduct.singlePrice = price;
+          thisProduct.price = thisProduct.singlePrice * thisProduct.amountWidget.value;
+          thisProduct.priceElem.innerHTML = thisProduct.price;
 
         }
       }
@@ -198,6 +207,52 @@
       const thisProduct = this;
 
       thisProduct.amountWidget = new AmountWidget(thisProduct.amountWidgetElem);
+    }
+
+    addToCart(){
+      const thisProduct = this;
+      app.cart.add(thisProduct);
+    }
+
+    prepareCartProduct(){
+      const thisProduct = this;
+      const productSummary = {
+        id: thisProduct.id,
+        name: thisProduct.data.name,
+        amount: thisProduct.amountWidget.value,
+        singlePrice: thisProduct.singlePrice,
+        price: thisProduct.price,
+        params: thisProduct.prepareCartProductParams(),
+      };
+      return (productSummary);
+    }
+
+    prepareCartProductParams() {
+      const thisProduct = this;
+
+      const formData = utils.serializeFormToObject(thisProduct.form);
+      const params = {};
+
+      for(let paramId in thisProduct.data.params) {
+        const param = thisProduct.data.params[paramId];
+
+        params[paramId] = {
+          name: param.label,
+          options: {}
+        };
+        console.log('++++', thisProduct.params);
+        for(let optionId in param.options) {
+          const option = param.options[optionId];
+          const optionSelected = formData[paramId] && formData[paramId].includes(optionId);
+
+          if(optionSelected) {
+            params[paramId].options = option;
+          }
+        }
+      }
+
+      return params;
+
     }
   }
 
@@ -219,9 +274,6 @@
       thisWidget.linkDecrease = thisWidget.element.querySelector(select.widgets.amount.linkDecrease);
       thisWidget.linkIncrease = thisWidget.element.querySelector(select.widgets.amount.linkIncrease);
     }
-
-
-
     setValue(value){
       const thisWidget = this;
       const newValue =parseInt(value);
@@ -240,8 +292,6 @@
 
       thisWidget.input.value = thisWidget.value;
     }
-
-
 
     announce() {
       const thisWidget = this;
@@ -302,8 +352,12 @@
 
       });
     }
+
+    add(menuProduct){
+      //const thisCart = this;
+    }
   }
-  class CartProduct {
+  /*   class CartProduct {
     constructor(menuProduct, element) {
       const thisCartProduct = this;
 
@@ -340,7 +394,7 @@
         thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
       });
     }
-  }
+  } */
 
 
   const app = {
