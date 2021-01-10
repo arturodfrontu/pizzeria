@@ -298,7 +298,7 @@
 
     announce() {
       const thisWidget = this;
-      const event = new Event('qtyChange', {
+      const event = new CustomEvent('update', {
         bubbles: true
       });
       thisWidget.element.dispatchEvent(event);
@@ -352,9 +352,14 @@
       const thisCart = this;
 
       thisCart.dom.toggleTrigger.addEventListener('click', function () {
-        thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
 
+        thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
       });
+      thisCart.dom.productList.addEventListener('update', function(){
+
+        thisCart.update();
+      });
+
     }
 
     add(menuProduct){
@@ -365,6 +370,35 @@
 
       cartProductList.appendChild(generatedDOM);
       thisCart.products.push(new CartProduct(menuProduct, generatedDOM));
+
+      thisCart.update();
+    }
+
+    update(){
+      const thisCart = this;
+
+      thisCart.deliveryFee = settings.cart.defaultDeliveryFee;
+      thisCart.totalNumber = 0;
+      thisCart.subtotalPrice = 0;
+
+      for(let product of thisCart.products){
+        thisCart.totalNumber += product.amount;
+        thisCart.subtotalPrice += product.price;
+      }
+
+      if(thisCart.totalNumber > 0){
+        thisCart.totalPrice = thisCart.subtotalPrice + thisCart.deliveryFee;
+      } else {
+        thisCart.totalPrice = 0;
+        thisCart.deliveryFee = 0;
+      }
+
+      thisCart.dom.subtotalPrice.innerHTML = thisCart.subtotalPrice;
+      thisCart.dom.totalNumber.innerHTML = thisCart.totalNumber;
+      thisCart.dom.deliveryFee.innerHTML = thisCart.deliveryFee;
+      for(let price of thisCart.dom.totalPrice){
+        price.innerHTML = thisCart.totalPrice;
+      }
     }
   }
   class CartProduct {
@@ -397,7 +431,7 @@
       const thisCartProduct = this;
 
       thisCartProduct.amountWidget = new AmountWidget(thisCartProduct.dom.amountWidget);
-      thisCartProduct.dom.amountWidget.addEventListener('qtyChange', function(){
+      thisCartProduct.dom.amountWidget.addEventListener('update', function(){
         thisCartProduct.amount = thisCartProduct.amountWidget.value;
         thisCartProduct.price = thisCartProduct.singlePrice * thisCartProduct.amount;
         thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
