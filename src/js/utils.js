@@ -1,4 +1,6 @@
-const utils = {};
+/* global Handlebars, dataSource */
+
+export const utils = {};
 
 utils.createDOMFromHTML = function(htmlString) {
   let div = document.createElement('div');
@@ -27,30 +29,52 @@ utils.serializeFormToObject = function(form){
         } else if ((field.type != 'checkbox' && field.type != 'radio') || field.checked) {
           utils.createPropIfUndefined(output, field.name);
           output[field.name].push(field.value);
-        } else if(!output[field.name]) output[field.name] = [];
+        }
       }
     }
   }
   return output;
 };
 
+utils.queryParams = function(params){
+  return Object.keys(params)
+    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+    .join('&');
+};
+
 utils.convertDataSourceToDbJson = function(){
   const productJson = [];
-  // eslint-disable-next-line no-undef
   for(let key in dataSource.products){
-    // eslint-disable-next-line no-undef
     productJson.push(Object.assign({id: key}, dataSource.products[key]));
   }
 
   console.log(JSON.stringify({product: productJson, order: []}, null, '  '));
 };
 
-// eslint-disable-next-line no-undef
+utils.numberToHour = function(number){
+  return (Math.floor(number) % 24) + ':' + (number % 1 * 60 + '').padStart(2, '0');
+};
+
+utils.hourToNumber = function(hour){
+  const parts = hour.split(':');
+
+  return parseInt(parts[0]) + parseInt(parts[1])/60;
+};
+
+utils.dateToStr = function(dateObj){
+  return dateObj.toISOString().slice(0, 10);
+};
+
+utils.addDays = function(dateStr, days){
+  const dateObj = new Date(dateStr);
+  dateObj.setDate(dateObj.getDate() + days);
+  return dateObj;
+};
+
 Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
   return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
 });
 
-// eslint-disable-next-line no-undef
 Handlebars.registerHelper('joinValues', function(input, options) {
   return Object.values(input).join(options.fn(this));
 });
