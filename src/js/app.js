@@ -58,7 +58,7 @@ const app = {
     }
   },
 
-  initData: function () {
+  initData: function(){
     const thisApp = this;
     const url = settings.db.url + '/' + settings.db.product;
     thisApp.data = {};
@@ -73,10 +73,11 @@ const app = {
       });
   },
 
-  initBooking(){
+  initBooking: function(){
     const thisApp = this;
+    const bookingWidget = document.querySelector(select.containerOf.booking);
 
-    thisApp.booking = document.querySelector(select.containerOf.booking);
+    thisApp.booking = new Booking(bookingWidget);
   },
 
   init: function(){
